@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+    <link rel="stylesheet" href="cart.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .checkout-container {
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .payment-header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+
+        .btn-green {
+            background-color: #28a745;
+            color: white;
+            width: 100%;
+        }
+
+        .btn-gray {
+            background-color: #6c757d;
+            color: white;
+            width: 100%;
+        }
+
+        .text-danger {
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="navbar-placeholder"></div>
+    <div class="container">
+        <div class="checkout-container">
+            <div class="payment-header">Payment Details</div>
+            <form id="checkout-form" class="p-3">
+                <div class="mb-3">
+                    <label class="form-label">Cardholder Name</label>
+                    <input type="text" class="form-control" id="cardholder-name" placeholder="Enter Cardholder Name"
+                        required>
+                    <div class="text-danger" id="name-error"></div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Card Number</label>
+                    <input type="text" class="form-control" id="card-number" placeholder="Enter Visa Card Number"
+                        required>
+                    <div class="text-danger" id="card-error"></div>
+                </div>
+                <div class="row">
+                    <div class="col-7 mb-3">
+                        <label class="form-label">Expiry Date</label>
+                        <input type="month" class="form-control" id="expiry-date" required>
+                        <div class="text-danger" id="expiry-error"></div>
+                    </div>
+                    <div class="col-5 mb-3">
+                        <label class="form-label">CVV</label>
+                        <input type="text" class="form-control" id="cvv" placeholder="Enter CVV" required>
+                        <div class="text-danger" id="cvv-error"></div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-green">Complete Payment</button>
+            </form>
+            <button onclick="goBackToCart()" class="btn btn-gray mt-2">Back to Cart</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("checkout-form").addEventListener("submit", function (event) {
+            event.preventDefault(); // Stop form from submitting immediately
+
+            // Get input values
+            let cardholderName = document.getElementById("cardholder-name").value.trim();
+            let cardNumber = document.getElementById("card-number").value.trim();
+            let expiryDate = document.getElementById("expiry-date").value;
+            let cvv = document.getElementById("cvv").value.trim();
+
+            // Error elements
+            let nameError = document.getElementById("name-error");
+            let cardError = document.getElementById("card-error");
+            let expiryError = document.getElementById("expiry-error");
+            let cvvError = document.getElementById("cvv-error");
+
+            // Reset errors
+            nameError.textContent = "";
+            cardError.textContent = "";
+            expiryError.textContent = "";
+            cvvError.textContent = "";
+
+            let valid = true;
+
+            // Validate Cardholder Name (Only letters and spaces)
+            if (!/^[A-Za-z\s]+$/.test(cardholderName)) {
+                nameError.textContent = "Cardholder name must contain only letters and spaces.";
+                valid = false;
+            }
+
+            // Validate Card Number (Must be 16 digits and start with "4" for Visa)
+            if (!/^[4][0-9]{15}$/.test(cardNumber)) {
+                cardError.textContent = "Invalid Visa card number. It must be 16 digits and start with '4'.";
+                valid = false;
+            }
+
+            // Validate Expiry Date (Must be in the future)
+            let today = new Date();
+            let year = parseInt(expiryDate.split("-")[0]); // Extract year
+            let month = parseInt(expiryDate.split("-")[1]); // Extract month
+            let inputDate = new Date(year, month, 0); // Set to last day of the expiry month
+
+            if (inputDate < today) {
+                expiryError.textContent = "Expiry date must be in the future.";
+                valid = false;
+            }
+
+            // Validate CVV (Must be exactly 3 digits)
+            if (!/^[0-9]{3}$/.test(cvv)) {
+                cvvError.textContent = "CVV must be exactly 3 digits.";
+                valid = false;
+            }
+
+            if (valid) {
+                alert("Payment Successful! Your order has been placed.");
+                localStorage.removeItem("cart");
+                window.location.href = "cart.html";
+            }
+        });
+
+        function goBackToCart() {
+            window.location.href = "cart.html";
+        }
+    </script>
+
+    <script src="../js/navbar.js"></script>
+    <script src="../js/checkout.js"></script>
+</body>
+
+</html>
